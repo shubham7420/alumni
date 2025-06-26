@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>All Alumni - Jaywant College of Engineering & Management</title>
+
+  <!-- ✅ jsPDF + AutoTable for PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+
+  <!-- ✅ SheetJS for Excel -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: #f7f9fb;
+      padding: 40px;
+      color: #333;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 28px;
+      color: #2a3f54;
+    }
+
+    header p {
+      margin: 8px 0 0;
+      font-size: 18px;
+      color: #555;
+    }
+
+    .controls {
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .filter-input {
+      display: block;
+      width: 100%;
+      max-width: 400px;
+      margin: 10px auto;
+      padding: 12px 18px;
+      border: 1px solid #aaa;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+
+    .btn {
+      background: #2a3f54;
+      color: #fff;
+      padding: 10px 18px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 15px;
+      margin: 10px;
+    }
+
+    .btn:hover {
+      background: #1d2e3f;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      overflow-x: auto;
+    }
+
+    th, td {
+      padding: 8px 10px;
+      border: 1px solid #ddd;
+      font-size: 14px;
+    }
+
+    th {
+      background: #2a3f54;
+      color: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    tr:nth-child(even) {
+      background: #f9f9f9;
+    }
+
+    tr:hover {
+      background: #eef;
+    }
+
+    .action-btn {
+      margin: 0 5px;
+      padding: 5px 10px;
+      font-size: 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .delete-btn {
+      background: #dc3545;
+      color: #fff;
+    }
+
+    @media (max-width: 768px) {
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+
+      thead tr {
+        display: none;
+      }
+
+      tr {
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+      }
+
+      td {
+        padding-left: 50%;
+        position: relative;
+        border: none;
+        border-bottom: 1px solid #ddd;
+      }
+
+      td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 15px;
+        font-weight: bold;
+        white-space: nowrap;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Jaywant College of Engineering & Management</h1>
+    <p>All Alumni Records</p>
+  </header>
+
+  <div class="controls">
+    <input type="text" id="filterInput" class="filter-input" placeholder="Search alumni by any field...">
+    <button class="btn" onclick="downloadPDF()">Download PDF</button>
+    <button class="btn" onclick="downloadExcel()">Download Excel</button>
+    <button class="btn" onclick="goToAnalytics()">Go to Analytics</button>
+  </div>
+
+  <div style="overflow-x:auto;">
+    <table id="alumniTable">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Full Name</th>
+          <th>Email</th>
+          <th>Contact Number</th>
+          <th>DOB</th>
+          <th>Gender</th>
+          <th>Department</th>
+          <th>Course</th>
+          <th>Admission Year</th>
+          <th>Batch Year</th>
+          <th>Enrollment Number</th>
+          <th>Occupation</th>
+          <th>Company</th>
+          <th>Career Path</th>
+          <th>Package</th>
+          <th>Address</th>
+          <th>City</th>
+          <th>State</th>
+          <th>Country</th>
+          <th>Achievements</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script>
+    async function loadAlumni() {
+      const response = await fetch('/api/alumni');
+      const result = await response.json();
+      const alumni = result.data;
+
+      const tbody = document.querySelector('#alumniTable tbody');
+      tbody.innerHTML = '';
+
+      alumni.forEach(a => {
+        const row = `
+          <tr>
+            <td data-label="ID">${a.id}</td>
+            <td data-label="Full Name">${a.full_name}</td>
+            <td data-label="Email">${a.email}</td>
+            <td data-label="Contact Number">${a.contact_number || ''}</td>
+            <td data-label="DOB">${a.dob || ''}</td>
+            <td data-label="Gender">${a.gender}</td>
+            <td data-label="Department">${a.department}</td>
+            <td data-label="Course">${a.course}</td>
+            <td data-label="Admission Year">${a.admission_year}</td>
+            <td data-label="Batch Year">${a.batch_year}</td>
+            <td data-label="Enrollment Number">${a.enrollment_number}</td>
+            <td data-label="Occupation">${a.current_occupation || ''}</td>
+            <td data-label="Company">${a.current_company || ''}</td>
+            <td data-label="Career Path">${a.career_path || ''}</td>
+            <td data-label="Package">${a.student_package || ''}</td>
+            <td data-label="Address">${a.address || ''}</td>
+            <td data-label="City">${a.city || ''}</td>
+            <td data-label="State">${a.state || ''}</td>
+            <td data-label="Country">${a.country || ''}</td>
+            <td data-label="Achievements">${a.achievements || ''}</td>
+            <td data-label="Actions">
+              <button class="action-btn delete-btn" onclick="deleteAlumni(${a.id})">Delete</button>
+            </td>
+          </tr>
+        `;
+        tbody.insertAdjacentHTML('beforeend', row);
+      });
+    }
+
+    document.getElementById('filterInput').addEventListener('input', function() {
+      const filter = this.value.toLowerCase();
+      const rows = document.querySelectorAll('#alumniTable tbody tr');
+      rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(filter) ? '' : 'none';
+      });
+    });
+
+    async function deleteAlumni(id) {
+      if (confirm(`Are you sure you want to delete Alumni ID ${id}?`)) {
+        try {
+          const response = await fetch(`/delete_alumni/${id}`, { method: 'DELETE' });
+          if (response.ok) {
+            alert(`Alumni ID ${id} deleted successfully.`);
+            loadAlumni();
+          } else {
+            alert(`Failed to delete Alumni ID ${id}.`);
+          }
+        } catch (err) {
+          console.error(err);
+          alert('Error deleting alumni.');
+        }
+      }
+    }
+
+
+
+function downloadPDF() {
+  const { jsPDF } = window.jspdf;
+
+  // 1️⃣ Create PDF: Landscape, Arch B size (12x18 inches)
+  const doc = new jsPDF({
+    orientation: 'landscape',
+    unit: 'pt',
+    format: [1296, 1800] // 12in x 18in in points
+  });
+
+  // 2️⃣ Collect visible rows, EXCLUDE last column (Actions)
+  const rows = [];
+  document.querySelectorAll('#alumniTable tbody tr').forEach(tr => {
+    if (tr.style.display !== 'none') {
+      const cells = Array.from(tr.querySelectorAll('td'));
+      const row = cells.slice(0, -1).map(td => td.innerText.trim());
+      rows.push(row);
+    }
+  });
+
+  if (rows.length === 0) {
+    alert('No data to export. Please search or reset filter.');
+    return;
+  }
+
+  // 3️⃣ Get headers, EXCLUDE last column
+  const headers = Array.from(document.querySelectorAll('#alumniTable thead th'))
+    .slice(0, -1)
+    .map(th => th.innerText);
+
+// ✅ 4️⃣ Add table with proper text size and center alignment
+doc.autoTable({
+  head: [headers],
+  body: rows,
+  startY: 120,  // enough space for title block
+  margin: { left: 60, right: 60 },
+  theme: 'grid',
+  styles: {
+    fontSize: 14,           // ✅ Normal table text size (~10pt)
+    cellPadding: 4,         // Comfortable padding
+    lineWidth: 0.7,
+    lineColor: [0, 0, 0],
+    halign: 'center',       // ✅ Horizontally center cell text
+    valign: 'middle',       // ✅ Vertically center cell text
+  },
+  headStyles: {
+    fillColor: [41, 63, 84],
+    textColor: [255, 255, 255],
+    fontStyle: 'bold',
+    fontSize: 15.5,           // ✅ Slightly larger header text
+    halign: 'center',
+    valign: 'middle',
+    lineWidth: 0.9,
+  },
+  alternateRowStyles: {
+    fillColor: [245, 245, 245],
+  },
+  tableLineWidth: 0.5,
+  tableLineColor: [0, 0, 0],
+
+  didDrawPage: function (data) {
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+
+    // ✅ 1️⃣ Page border
+    doc.setDrawColor(0);
+    doc.setLineWidth(1);
+    doc.rect(30, 30, pageWidth - 60, pageHeight - 60);
+
+// ✅ 2️⃣ College name and info (centered & properly spaced)
+
+// College name: bold, big, centered
+doc.setFont('helvetica', 'bold');
+doc.setFontSize(28);
+doc.setTextColor(40);
+doc.text('Jaywant College of Engineering & Management', pageWidth / 2, 70, { align: 'center' });
+
+// Subtitle: normal, slightly smaller, with clear gap below the title
+doc.setFont('helvetica', 'normal');
+doc.setFontSize(18);
+doc.text(`Alumni Records — Generated on: ${new Date().toLocaleString()}`, pageWidth / 2, 100, { align: 'center' });
+
+    // ✅ 3️⃣ Page number, normal size
+    doc.setFontSize(10);
+    doc.text(`Page ${doc.internal.getNumberOfPages()}`, pageWidth - 40, pageHeight - 30);
+  }
+});
+
+
+  // 5️⃣ Save file
+  doc.save('alumni_records_archB.pdf');
+}
+    
+
+
+function downloadExcel() {
+  // 1️⃣ Get visible rows excluding Actions
+  const table = document.getElementById('alumniTable');
+
+  const headers = Array.from(table.querySelectorAll('thead th'))
+    .slice(0, -1)
+    .map(th => th.innerText);
+
+  const rows = [];
+  table.querySelectorAll('tbody tr').forEach(tr => {
+    if (tr.style.display !== 'none') {
+      const row = Array.from(tr.querySelectorAll('td'))
+        .slice(0, -1)
+        .map(td => td.innerText.trim());
+      rows.push(row);
+    }
+  });
+
+  if (rows.length === 0) {
+    alert("No data to export. Please filter or reset filters.");
+    return;
+  }
+
+  // 2️⃣ Build data array with extra title rows
+  const ws_data = [
+    ["Jaywant College of Engineering & Management"], // row 1
+    [`Alumni Records - Generated on: ${new Date().toLocaleString()}`], // row 2
+    [], // row 3 empty
+    headers, // row 4 table header
+    ...rows
+  ];
+
+  // 3️⃣ Create worksheet
+  const ws = XLSX.utils.aoa_to_sheet(ws_data);
+
+  // 4️⃣ Merge title cells for centering
+  const totalCols = headers.length;
+  ws['!merges'] = [
+    { s: { r: 0, c: 0 }, e: { r: 0, c: totalCols - 1 } }, // college name
+    { s: { r: 1, c: 0 }, e: { r: 1, c: totalCols - 1 } }  // generated on
+  ];
+
+  // 5️⃣ Apply styles: titles & header bold, big, centered + borders
+  const borderStyle = {
+    top: { style: "thin", color: { auto: 1 } },
+    bottom: { style: "thin", color: { auto: 1 } },
+    left: { style: "thin", color: { auto: 1 } },
+    right: { style: "thin", color: { auto: 1 } }
+  };
+
+  // Title row
+  const collegeCell = ws['A1'];
+  collegeCell.s = {
+    font: { bold: true, sz: 20 },
+    alignment: { horizontal: "center", vertical: "center" }
+  };
+
+  const dateCell = ws['A2'];
+  dateCell.s = {
+    font: { bold: true, sz: 16 },
+    alignment: { horizontal: "center", vertical: "center" }
+  };
+
+  // Header row (4th row, index 3)
+  headers.forEach((_, colIndex) => {
+    const addr = XLSX.utils.encode_cell({ r: 3, c: colIndex });
+    if (ws[addr]) {
+      ws[addr].s = {
+        font: { bold: true },
+        alignment: { horizontal: "center", vertical: "center" },
+        border: borderStyle
+      };
+    }
+  });
+
+  // Table data rows: borders + center align
+  for (let r = 4; r < ws_data.length; r++) {
+    for (let c = 0; c < headers.length; c++) {
+      const addr = XLSX.utils.encode_cell({ r: r, c: c });
+      if (ws[addr]) {
+        ws[addr].s = {
+          alignment: { horizontal: "center", vertical: "center" },
+          border: borderStyle
+        };
+      }
+    }
+  }
+
+  // 6️⃣ Auto column widths
+  const colWidths = headers.map((h, i) => {
+    const colVals = [h, ...rows.map(r => r[i] || "")];
+    const maxLen = Math.max(...colVals.map(v => v.toString().length));
+    return { wch: maxLen + 4 };
+  });
+  ws['!cols'] = colWidths;
+
+  // 7️⃣ Create workbook & save
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Alumni Records");
+  XLSX.writeFile(wb, 'alumni_records.xlsx');
+}
+
+function goToAnalytics() {
+  window.location.href = 'analytics';
+}
+
+
+// ✅ Call to load alumni on page load
+loadAlumni();
+  </script>
+</body>
+</html>

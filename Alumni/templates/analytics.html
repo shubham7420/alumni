@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>JCEM Alumni Dashboard</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- html2pdf.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <!-- Google Maps JS API (replace YOUR_API_KEY) -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>
+
+  <style>
+   
+body {
+  background: #f8f9fa;
+}
+
+/* === HEADER STYLING === */
+header {
+  background: #0d6efd;  /* Blue background */
+  color: white;         /* White text by default */
+  padding: 30px 0;
+  text-align: center;
+  position: relative;
+}
+
+/* Specific college info inside header */
+header .college-header h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  margin: 0 0 8px;
+}
+
+header .college-header .subtitle {
+  font-size: 1.1rem;
+  margin: 0 0 12px;
+  font-weight: 500;
+}
+
+header .college-header h4 {
+  font-size: 1.2rem;
+  margin: 0 0 20px;
+}
+
+/* Position buttons inside header */
+header .logout-btn {
+  position: absolute;
+  right: 30px;
+  top: 30px;
+}
+
+header .view-btn {
+  position: absolute;
+  left: 30px;
+  top: 30px;
+}
+
+.header-buttons {
+  text-align: center;
+}
+
+.header-buttons .btn {
+  margin: 0 8px;
+}
+
+/* === FOOTER === */
+footer {
+  background: #0d6efd;
+  color: white;
+  padding: 15px 0;
+  text-align: center;
+  margin-top: 40px;
+}
+
+/* === FILTERS SECTION === */
+.filters {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 30px auto;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+/* === CHART CONTAINERS === */
+.chart-container {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 30px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  height: 400px;
+}
+
+.chart-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+
+  </style>
+</head>
+<body>
+
+  
+<!-- ✅ HEADER -->
+<header class="college-header">
+  <h1>Jaywant College of Engineering &amp; Polytechnic</h1>
+  <p class="subtitle">Kille Machindragad, Tal. Walwa, Dist. Sangli</p>
+  <h4>Alumni Analytics Dashboard</h4>
+  <div class="header-buttons">
+    <a href="/all_alumni" class="btn btn-info">View All Alumni</a>
+    <a href="/logout" class="btn btn-danger">Logout</a>
+  </div>
+</header>
+
+<!-- ✅ FILTERS -->
+<div class="container filters">
+  <div class="row g-3">
+    <div class="col-md-2"><label class="form-label">Gender</label><select id="genderFilter" class="form-select"></select></div>
+    <div class="col-md-2"><label class="form-label">Department</label><select id="departmentFilter" class="form-select"></select></div>
+    <div class="col-md-2"><label class="form-label">Course</label><select id="courseFilter" class="form-select"></select></div>
+    <div class="col-md-2"><label class="form-label">Admission Year</label><select id="admission_yearFilter" class="form-select"></select></div>
+    <div class="col-md-2"><label class="form-label">Batch Year</label><select id="batch_yearFilter" class="form-select"></select></div>
+    <div class="col-md-2"><label class="form-label">Country</label><select id="countryFilter" class="form-select"></select></div>
+  </div>
+  <div class="mt-4 text-center">
+    <button class="btn btn-primary me-2" onclick="applyFilters()">Apply Filters</button>
+    <button class="btn btn-secondary me-2" onclick="resetFilters()">Reset Filters</button>
+    <button class="btn btn-success" onclick="generatePDF()">Download PDF Report</button>
+  </div>
+</div>
+
+<!-- ✅ Only ONE charts container -->
+<div class="container" id="chartsToExport">
+  <div class="row">
+    <div class="col-lg-6 chart-container"><canvas id="genderChart"></canvas></div>
+    <div class="col-lg-6 chart-container"><canvas id="departmentChart"></canvas></div>
+    <div class="col-lg-6 chart-container"><canvas id="courseChart"></canvas></div>
+    <div class="col-lg-6 chart-container"><canvas id="admissionYearChart"></canvas></div>
+    <div class="col-lg-6 chart-container"><canvas id="batchYearChart"></canvas></div>
+    <div class="col-lg-6 chart-container"><canvas id="countryChart"></canvas></div>
+    <div class="col-lg-6 chart-container"><canvas id="stateChart"></canvas></div>
+    <div class="col-lg-6 chart-container"><canvas id="cityChart"></canvas></div>
+    <div class="col-lg-6 chart-container"><canvas id="packageChart"></canvas></div>
+  </div>
+</div>
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+
+<!-- ✅ SCRIPT -->
+<script>
+  const rawData = {{ alumni_data | tojson }};
+  let filteredData = [...rawData];
+  const charts = {};
+
+  function countByField(data, field) {
+    return data.reduce((acc, item) => {
+      const key = item[field] || 'Unknown';
+      acc[key] = (acc[key] || 0) + 1;
+      return acc;
+    }, {});
+  }
+
+  function populateFilterOptions() {
+    const filters = ['gender', 'department', 'course', 'admission_year', 'batch_year', 'country'];
+    filters.forEach(f => {
+      const unique = [...new Set(rawData.map(d => d[f]))].filter(v => v);
+      const select = document.getElementById(`${f}Filter`);
+      select.innerHTML = `<option value="">All</option>`;
+      unique.forEach(val => {
+        select.innerHTML += `<option value="${val}">${val}</option>`;
+      });
+    });
+  }
+
+  function applyFilters() {
+    const gender = document.getElementById('genderFilter').value;
+    const department = document.getElementById('departmentFilter').value;
+    const course = document.getElementById('courseFilter').value;
+    const admissionYear = document.getElementById('admission_yearFilter').value;
+    const batchYear = document.getElementById('batch_yearFilter').value;
+    const country = document.getElementById('countryFilter').value;
+
+    filteredData = rawData.filter(item => {
+      return (!gender || item.gender === gender) &&
+             (!department || item.department === department) &&
+             (!course || item.course === course) &&
+             (!admissionYear || item.admission_year == admissionYear) &&
+             (!batchYear || item.batch_year == batchYear) &&
+             (!country || item.country === country);
+    });
+    renderAllCharts();
+  }
+
+  function resetFilters() {
+    ['genderFilter', 'departmentFilter', 'courseFilter', 'admission_yearFilter', 'batch_yearFilter', 'countryFilter']
+      .forEach(id => document.getElementById(id).value = '');
+    filteredData = [...rawData];
+    renderAllCharts();
+  }
+
+  function renderAllCharts() {
+    Object.values(charts).forEach(chart => chart.destroy());
+
+    const palette = ['#36A2EB', '#FF6384', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#00A36C', '#E6B0AA', '#AED6F1', '#F7DC6F'];
+
+    charts.gender = new Chart(document.getElementById('genderChart'), {
+      type: 'pie',
+      data: {
+        labels: Object.keys(countByField(filteredData, 'gender')),
+        datasets: [{ data: Object.values(countByField(filteredData, 'gender')), backgroundColor: palette }]
+      },
+      options: { plugins: { title: { display: true, text: 'Gender Distribution' } } }
+    });
+
+    charts.department = new Chart(document.getElementById('departmentChart'), {
+      type: 'bar',
+      data: {
+        labels: Object.keys(countByField(filteredData, 'department')),
+        datasets: [{ label: 'Count', data: Object.values(countByField(filteredData, 'department')), backgroundColor: palette }]
+      },
+      options: { plugins: { title: { display: true, text: 'Department Distribution' } } }
+    });
+
+    charts.course = new Chart(document.getElementById('courseChart'), {
+      type: 'bar',
+      data: {
+        labels: Object.keys(countByField(filteredData, 'course')),
+        datasets: [{ label: 'Count', data: Object.values(countByField(filteredData, 'course')), backgroundColor: palette }]
+      },
+      options: { plugins: { title: { display: true, text: 'Course Distribution' } } }
+    });
+
+    charts.admissionYear = new Chart(document.getElementById('admissionYearChart'), {
+      type: 'bar',
+      data: {
+        labels: Object.keys(countByField(filteredData, 'admission_year')),
+        datasets: [{ label: 'Count', data: Object.values(countByField(filteredData, 'admission_year')), backgroundColor: palette }]
+      },
+      options: { plugins: { title: { display: true, text: 'Admission Years' } } }
+    });
+
+    charts.batchYear = new Chart(document.getElementById('batchYearChart'), {
+      type: 'bar',
+      data: {
+        labels: Object.keys(countByField(filteredData, 'batch_year')),
+        datasets: [{ label: 'Count', data: Object.values(countByField(filteredData, 'batch_year')), backgroundColor: palette }]
+      },
+      options: { plugins: { title: { display: true, text: 'Batch Years' } } }
+    });
+
+    charts.country = new Chart(document.getElementById('countryChart'), {
+      type: 'bar',
+      data: {
+        labels: Object.keys(countByField(filteredData, 'country')),
+        datasets: [{ label: 'Count', data: Object.values(countByField(filteredData, 'country')), backgroundColor: palette }]
+      },
+      options: { plugins: { title: { display: true, text: 'Country Distribution' } } }
+    });
+
+    charts.state = new Chart(document.getElementById('stateChart'), {
+      type: 'bar',
+      data: {
+        labels: Object.keys(countByField(filteredData, 'state')),
+        datasets: [{ label: 'Count', data: Object.values(countByField(filteredData, 'state')), backgroundColor: palette }]
+      },
+      options: { plugins: { title: { display: true, text: 'State Distribution' } } }
+    });
+
+    charts.city = new Chart(document.getElementById('cityChart'), {
+      type: 'bar',
+      data: {
+        labels: Object.keys(countByField(filteredData, 'city')),
+        datasets: [{ label: 'Count', data: Object.values(countByField(filteredData, 'city')), backgroundColor: palette }]
+      },
+      options: { plugins: { title: { display: true, text: 'City Distribution' } } }
+    });
+
+    // Average package by department
+    const pkgData = {};
+    filteredData.forEach(item => {
+      const dept = item.department || 'Unknown';
+      const pkg = parseFloat(item.student_package || 0);
+      if (!pkgData[dept]) pkgData[dept] = { total: 0, count: 0 };
+      pkgData[dept].total += pkg;
+      pkgData[dept].count += 1;
+    });
+    const pkgLabels = Object.keys(pkgData);
+    const pkgAverages = pkgLabels.map(dept => pkgData[dept].total / pkgData[dept].count);
+    charts.package = new Chart(document.getElementById('packageChart'), {
+      type: 'bar',
+      data: {
+        labels: pkgLabels,
+        datasets: [{ label: 'Average Package (LPA)', data: pkgAverages, backgroundColor: palette }]
+      },
+      options: { plugins: { title: { display: true, text: 'Average Package by Department' } } }
+    });
+  }
+
+
+function generatePDF() {
+  const pdfContainer = document.createElement('div');
+  pdfContainer.style.display = 'block';
+  pdfContainer.style.width = '100%';
+  pdfContainer.style.padding = '0';
+  pdfContainer.style.margin = '0';
+  pdfContainer.style.boxSizing = 'border-box';
+  pdfContainer.style.background = '#fff';
+
+  const now = new Date().toLocaleString();
+
+  Object.entries(charts).forEach(([name, chart], index) => {
+    const page = document.createElement('div');
+    page.style.pageBreakAfter = 'always';
+    page.style.width = '100%';
+    page.style.maxWidth = '1000px';
+    page.style.margin = '20px auto';
+    page.style.padding = '30px';
+    page.style.border = '8px solid #333';
+    page.style.boxSizing = 'border-box';
+    page.style.background = '#fff';
+    page.style.textAlign = 'center';
+
+    const header = document.createElement('div');
+    header.innerHTML = `
+      <h2 style="margin:0;">Jaywant College of Engineering & Polytechnic</h2>
+      <p style="margin:5px 0 10px;">Generated on: ${now}</p>
+      <hr style="border: 1px solid #333; margin-bottom: 20px;">
+      <h4 style="margin-bottom: 20px;">${chart.options.plugins.title.text}</h4>
+    `;
+    page.appendChild(header);
+
+    const img = document.createElement('img');
+    img.src = chart.toBase64Image();
+    img.style.width = '90%';
+    img.style.maxWidth = '100%';
+    img.style.margin = '0 auto 20px';
+    page.appendChild(img);
+
+    pdfContainer.appendChild(page);
+  });
+
+  // Add to body TEMPORARILY
+  document.body.appendChild(pdfContainer);
+
+  // ✅ Use recommended settings for landscape + page break handling
+  html2pdf().from(pdfContainer).set({
+    margin: 0,
+    filename: 'Alumni_Analytics_Report.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true
+    },
+    jsPDF: {
+      unit: 'in',
+      format: 'a4',
+      orientation: 'landscape'
+    },
+    pagebreak: { mode: ['css', 'legacy'] } // ensure page breaks work
+  }).save().then(() => {
+    // Cleanup
+    document.body.removeChild(pdfContainer);
+  });
+}
+
+
+  populateFilterOptions();
+  renderAllCharts();
+
+</script>
+
+
+
+</body>
+</html>

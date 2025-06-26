@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Student Alumni Registration</title>
+  <style>
+    /* === Base body style === */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f0f4f8, #dbeafe);
+      margin: 0;
+      padding: 50px 20px;
+      color: #1e293b;
+    }
+
+    /* === Heading === */
+    h1 {
+      text-align: center;
+      color: #1e40af;
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+
+    h1 .subtitle {
+      display: block;
+      font-size: 1rem;
+      font-weight: 500;
+      color: #64748b;
+      margin-top: 4px;
+    }
+
+    /* === Form Container === */
+    form {
+      background: #ffffff;
+      padding: 50px 40px;
+      border-radius: 12px;
+      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.08);
+      max-width: 800px;
+      margin: 30px auto;
+    }
+
+    /* === Labels === */
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    /* === Inputs, Selects, Textareas === */
+    input,
+    select,
+    textarea {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 14px 18px;
+      margin-bottom: 20px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: #1e40af;
+      box-shadow: 0 0 6px rgba(30, 64, 175, 0.25);
+      outline: none;
+    }
+
+    /* === Buttons === */
+    .button-group {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .button-group button,
+    .button-group a {
+      display: inline-block;
+      background: linear-gradient(135deg, #1e40af, #1d4ed8);
+      color: #fff;
+      text-decoration: none;
+      padding: 12px 30px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+      border: none;
+      cursor: pointer;
+      margin: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .button-group button:hover,
+    .button-group a:hover {
+      background: linear-gradient(135deg, #1d4ed8, #2563eb);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 18px rgba(30, 64, 175, 0.3);
+    }
+
+    /* === Responsive === */
+    @media (max-width: 768px) {
+      form {
+        padding: 30px 20px;
+      }
+
+      h1 {
+        font-size: 1.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>
+    Student Alumni Registration Page<br>
+    <span class="subtitle">Jaywant College of Engineering &amp; Polytechnic, Kille Machindragad, Tal. Walwa, Dist. Sangli</span>
+  </h1>
+
+<!-- 
+
+  <div class="container">
+    <a href="/index" class="home-link">← Back to Home</a> -->
+
+  <!-- ==========================
+       ✅ Alumni Registration Form
+       ========================== -->
+  <form id="alumniForm">
+    
+    <!-- 📌 Full Name (Required) -->
+    <label for="full_name">Full Name:</label>
+    <input 
+      type="text"
+      id="full_name"
+      name="full_name"
+      required
+      placeholder="Enter Full Name">
+
+    <!-- 📌 Email (Required + Valid Pattern) -->
+    <label for="email">Email:</label>
+    <input 
+      type="email"
+      id="email"
+      name="email"
+      pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+      required
+      placeholder="example@domain.com"
+      title="Enter a valid email">
+
+    <!-- 📌 Contact Number (Required, 10 digits) -->
+    <label for="contact_number">Contact Number:</label>
+    <input 
+      type="tel"
+      id="contact_number"
+      name="contact_number"
+      pattern="\d{10}"
+      maxlength="10"
+      required
+      placeholder="Enter 10 digit number"
+      title="Please enter exactly 10 digits">
+
+    <!-- 📌 Date of Birth (Required, must be in past) -->
+    <label for="dob">Date of Birth:</label>
+    <input 
+      type="date"
+      id="dob"
+      name="dob"
+      required
+      placeholder="YYYY-MM-DD"
+      max=""> <!-- JS can set max to today -->
+
+    <!-- 📌 Gender Selection -->
+    <label for="gender">Gender:</label>
+    <select id="gender" name="gender" required>
+      <option value="">-- Select Gender --</option>
+      <option value="Male">Male</option>
+      <option value="Female">Female</option>
+      <option value="Other">Other</option>
+    </select>
+
+    <!-- 📌 Department Dropdown (Dynamic) -->
+    <label for="department">Department:</label>
+    <select id="department" name="department" required>
+      <option value="">-- Select Department --</option>
+      <!-- JS will populate -->
+    </select>
+
+    <!-- 📌 Course Dropdown (Depends on Department) -->
+    <label for="course">Course:</label>
+    <select id="course" name="course" required>
+      <option value="">-- Select Course --</option>
+      <!-- JS will populate based on department -->
+    </select>
+
+    <!-- 📌 Admission Year (Dropdown) -->
+    <label for="admission_year">Admission Year:</label>
+    <select id="admission_year" name="admission_year" required>
+      <option value="">-- Select Admission Year --</option>
+      <!-- JS can fill past years -->
+    </select>
+
+    <!-- 📌 Batch Year (Dropdown) -->
+    <label for="batch_year">Batch Year:</label>
+    <select id="batch_year" name="batch_year" required>
+      <option value="">-- Select Batch Year --</option>
+      <!-- JS can fill valid years >= admission -->
+    </select>
+
+    <!-- 📌 Enrollment Number (Required, Pattern A-Z0-9) -->
+    <label for="enrollment_number">Enrollment Number:</label>
+    <input 
+      type="text"
+      id="enrollment_number"
+      name="enrollment_number"
+      pattern="[A-Z0-9]{1,15}"
+      maxlength="15"
+      required
+      placeholder="Enrollment Number"
+      title="Use 1 to 15 uppercase letters (A–Z) and numbers (0–9) only">
+
+    <!-- 📌 Current Occupation (Optional) -->
+    <label for="current_occupation">Current Occupation:</label>
+    <input 
+      type="text"
+      id="current_occupation"
+      name="current_occupation"
+      placeholder="e.g., Software Engineer">
+
+    <!-- 📌 Current Company (Optional) -->
+    <label for="current_company">Current Company:</label>
+    <input 
+      type="text"
+      id="current_company"
+      name="current_company"
+      placeholder="e.g., TCS, Infosys, Google">
+
+    <!-- 📌 Career Path (Optional) -->
+    <label for="career_path">Career Path:</label>
+    <input 
+      type="text"
+      id="career_path"
+      name="career_path"
+      placeholder="e.g., Research, Management, Software Development">
+
+    <!-- 📌 Student Package (Optional, Numeric) -->
+    <label for="student_package">Student Package:</label>
+    <input 
+      type="number"
+      id="student_package"
+      name="student_package"
+      step="0.01"
+      min="0"
+      placeholder="Enter amount (e.g., 450000.50)"
+      title="Enter a valid number or decimal amount">
+
+    <!-- 📌 Address (Required) -->
+    <label for="address">Address:</label>
+    <textarea 
+      id="address"
+      name="address"
+      required
+      placeholder="Enter your address"></textarea>
+
+    <!-- 📌 City (Required) -->
+    <label for="city">City:</label>
+    <input 
+      type="text"
+      id="city"
+      name="city"
+      required
+      placeholder="Enter your city">
+
+    <!-- 📌 State (Required) -->
+    <label for="state">State:</label>
+    <input 
+      type="text"
+      id="state"
+      name="state"
+      required
+      placeholder="Enter your state">
+
+    <!-- 📌 Country Dropdown (Required, dynamic) -->
+    <label for="country">Country:</label>
+    <select id="country" name="country" required>
+      <option value="">-- Select Country --</option>
+      <!-- JS can populate country list -->
+    </select>
+
+    <!-- 📌 Achievements (Optional) -->
+    <label for="achievements">Achievements:</label>
+    <textarea 
+      id="achievements"
+      name="achievements"
+      placeholder="Enter achievements"></textarea>
+
+    <!-- ✅ Submit Button -->
+    <div class="button-group">
+      <button type="submit">Create Alumni</button>
+      <a href="/index">← Back to Home</a>
+    </div>  </form>
+
+<script>
+// ------------------------------
+// ✅ CONTACT NUMBER: Digits only, max length 10
+// ------------------------------
+const contactInput = document.getElementById('contact_number');
+contactInput.addEventListener('input', () => {
+  contactInput.value = contactInput.value.replace(/\D/g, '').slice(0, 10);
+});
+
+// ------------------------------
+// ✅ EMAIL: Allow only valid characters
+// ------------------------------
+const emailInput = document.getElementById('email');
+emailInput.addEventListener('input', () => {
+  emailInput.value = emailInput.value.replace(/[^a-zA-Z0-9@._+-]/g, '');
+});
+
+// ------------------------------
+// ✅ FULL NAME: Only letters & spaces, auto InitCap
+// ------------------------------
+const fullNameInput = document.getElementById('full_name');
+fullNameInput.addEventListener('input', () => {
+  let value = fullNameInput.value.replace(/[^a-zA-Z\s]/g, '');
+  value = toInitCap(value);
+  fullNameInput.value = value;
+});
+
+// ------------------------------
+// ✅ DOB: Limit to today or earlier
+// ------------------------------
+const dobInput = document.getElementById('dob');
+const today = new Date().toISOString().split('T')[0];
+dobInput.setAttribute('max', today);
+
+// ------------------------------
+// ✅ Populate Admission & Batch Year: 1990 to current year
+// ------------------------------
+const admissionYearSelect = document.getElementById('admission_year');
+const batchYearSelect = document.getElementById('batch_year');
+const currentYear = new Date().getFullYear();
+for (let year = 1990; year <= currentYear; year++) {
+  const option1 = new Option(year, year);
+  const option2 = new Option(year, year);
+  admissionYearSelect.add(option1);
+  batchYearSelect.add(option2);
+}
+
+// ------------------------------
+// ✅ ENROLLMENT NUMBER: Uppercase, alphanumeric, max 15 chars
+// ------------------------------
+const enrollmentNumber = document.getElementById('enrollment_number');
+enrollmentNumber.addEventListener('input', () => {
+  enrollmentNumber.value = enrollmentNumber.value
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, '')
+    .slice(0, 15);
+});
+
+// ------------------------------
+// ✅ Helper: Convert string to InitCap
+// ------------------------------
+function toInitCap(str) {
+  return str.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+}
+
+// ------------------------------
+// ✅ CURRENT OCCUPATION, COMPANY & CAREER PATH: InitCap on blur
+// ------------------------------
+['current_occupation', 'current_company', 'career_path'].forEach(id => {
+  const input = document.getElementById(id);
+  input.addEventListener('blur', () => {
+    input.value = toInitCap(input.value.trim());
+  });
+});
+
+// ------------------------------
+// ✅ STUDENT PACKAGE: Allow only numbers & one dot
+// ------------------------------
+const studentPackage = document.getElementById('student_package');
+studentPackage.addEventListener('input', () => {
+  studentPackage.value = studentPackage.value
+    .replace(/[^0-9.]/g, '')      // Remove non-digits & non-dot
+    .replace(/(\..*?)\..*/g, '$1'); // Allow only one dot
+});
+
+// ✅ Validate Student Package on submit
+document.getElementById('alumniForm').addEventListener('submit', function (e) {
+  const value = studentPackage.value.trim();
+  if (value && (isNaN(value) || Number(value) < 0)) {
+    e.preventDefault();
+    alert('Student Package must be a valid positive number or decimal.');
+    studentPackage.focus();
+  }
+});
+
+// ------------------------------
+// ✅ ADDRESS, CITY, STATE, ACHIEVEMENTS: InitCap on blur
+// ------------------------------
+['address', 'city', 'state', 'achievements'].forEach(id => {
+  const field = document.getElementById(id);
+  field.addEventListener('blur', () => {
+    field.value = toInitCap(field.value.trim());
+  });
+});
+
+// ------------------------------
+// ✅ COUNTRY DROPDOWN: Prepopulate with list, default to India
+// ------------------------------
+const countries = [
+  "Afghanistan", "Albania", "Algeria", "Andorra", "Angola",
+  "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria",
+  "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados",
+  "Belarus", "Belgium", "Belize", "Benin", "Bhutan",
+  "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei",
+  "Bulgaria", "Burkina Faso", "Burundi", "Cabo Verde", "Cambodia",
+  "Cameroon", "Canada", "Central African Republic", "Chad", "Chile",
+  "China", "Colombia", "Comoros", "Congo (Congo-Brazzaville)", "Costa Rica",
+  "Croatia", "Cuba", "Cyprus", "Czechia (Czech Republic)", "Democratic Republic of the Congo",
+  "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Ecuador",
+  "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia",
+  "Eswatini (fmr. Swaziland)", "Ethiopia", "Fiji", "Finland", "France",
+  "Gabon", "Gambia", "Georgia", "Germany", "Ghana",
+  "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau",
+  "Guyana", "Haiti", "Holy See", "Honduras", "Hungary",
+  "Iceland", "India", "Indonesia", "Iran", "Iraq",
+  "Ireland", "Israel", "Italy", "Jamaica", "Japan",
+  "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Kuwait",
+  "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho",
+  "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg",
+  "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali",
+  "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico",
+  "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro",
+  "Morocco", "Mozambique", "Myanmar (formerly Burma)", "Namibia", "Nauru",
+  "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger",
+  "Nigeria", "North Korea", "North Macedonia", "Norway", "Oman",
+  "Pakistan", "Palau", "Palestine State", "Panama", "Papua New Guinea",
+  "Paraguay", "Peru", "Philippines", "Poland", "Portugal",
+  "Qatar", "Romania", "Russia", "Rwanda", "Saint Kitts and Nevis",
+  "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe",
+  "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone",
+  "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia",
+  "South Africa", "South Korea", "South Sudan", "Spain", "Sri Lanka",
+  "Sudan", "Suriname", "Sweden", "Switzerland", "Syria",
+  "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo",
+  "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan",
+  "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom",
+  "United States of America", "Uruguay", "Uzbekistan", "Vanuatu", "Venezuela",
+  "Vietnam", "Yemen", "Zambia", "Zimbabwe"
+];
+const countrySelect = document.getElementById('country');
+countries.forEach(country => {
+  const option = new Option(country, country);
+  if (country === 'India') option.selected = true;
+  countrySelect.add(option);
+});
+
+ const departmentSelect = document.getElementById('department');
+    const courseSelect = document.getElementById('course');
+
+    // 1️⃣ Load departments
+    async function loadDepartments() {
+      const res = await fetch('/api/departments'); // your GET endpoint for all departments
+      const departments = await res.json();
+
+      departments.forEach(dept => {
+        const option = document.createElement('option');
+        option.value = dept.name;  // or dept.id if using ID-based route
+        option.textContent = dept.name;
+        departmentSelect.appendChild(option);
+      });
+    }
+
+    // 2️⃣ When department changes, load its courses
+    departmentSelect.addEventListener('change', async () => {
+      const deptName = departmentSelect.value;
+      courseSelect.innerHTML = '<option value="">-- Select Course --</option>';
+      if (deptName) {
+        const res = await fetch(`/api/departments/${deptName}/courses`); // your GET courses endpoint by dept name
+        const data = await res.json();
+        data.courses.forEach(course => {
+          const option = document.createElement('option');
+        option.value = course.name; // ✅ store name here
+          option.textContent = course.name;
+          courseSelect.appendChild(option);
+        });
+      }
+    });
+
+    // Initial load
+    loadDepartments();
+
+
+  // Validate & transform before submit
+  const form = document.getElementById('alumniForm');
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    // Get data
+    const data = Object.fromEntries(new FormData(form).entries());
+
+
+// ----------------------------------------------
+// ✅ 1️⃣  Send form data to your Flask API route
+// ----------------------------------------------
+
+const response = await fetch('/add_alumni', {
+  method: 'POST', // Use POST to create a new alumni record
+  headers: {
+    'Content-Type': 'application/json' // Tell the server we're sending JSON
+  },
+  body: JSON.stringify(data) // Convert JS object to JSON string for server
+});
+
+// ----------------------------------------------
+// ✅ 2️⃣  Handle the server response
+// ----------------------------------------------
+if (response.ok) {
+  // ✅ Success: Alumni was added in the database
+  alert('✅ Alumni created successfully!');
+  form.reset();            // Clear the form fields
+  countrySelect.value = 'India'; // Reset country field to default "India"
+
+} else {
+  // ❌ Error: something went wrong on the server or validation failed
+  const err = await response.json(); // Parse error JSON
+  alert('❌ Error: ' + (err.error || err.message)); // Show error message
+}
+
+  });
+
+</script>
+</body>
+</html>

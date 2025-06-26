@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Login</title>
+  <style>
+    /* === Body === */
+    body {
+      background: #f0f4f8;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+
+    /* === Container === */
+    .login-container {
+      background: #ffffff;
+      padding: 40px 30px;
+      border-radius: 10px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+      max-width: 400px;
+      width: 100%;
+    }
+
+    /* === Titles === */
+    h1 {
+      text-align: center;
+      color: #1e40af;
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #334155;
+      font-size: 1rem;
+      font-weight: 600;
+      line-height: 1.4;
+      margin-bottom: 30px;
+    }
+
+    h2 .subtitle {
+      display: block;
+      font-size: 0.9rem;
+      color: #64748b;
+      margin-top: 4px;
+      font-weight: 400;
+    }
+
+    /* === Form === */
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      margin-bottom: 20px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      box-sizing: border-box;
+      font-size: 1rem;
+      transition: border 0.3s;
+    }
+
+    input:focus {
+      border-color: #1e40af;
+      outline: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #1e40af, #1d4ed8);
+      border: none;
+      color: #ffffff;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    button:hover {
+      background: linear-gradient(135deg, #1d4ed8, #2563eb);
+      transform: translateY(-2px);
+    }
+
+    /* === Links === */
+    .links {
+      text-align: center;
+      margin-top: 25px;
+    }
+
+    .links p {
+      margin: 0 0 10px;
+      color: #334155;
+      font-size: 0.95rem;
+    }
+
+    .links a {
+      color: #1e40af;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+
+    .links a:hover {
+      color: #2563eb;
+      text-decoration: underline;
+    }
+
+    @media (max-width: 480px) {
+      .login-container {
+        padding: 30px 20px;
+      }
+
+      h1 {
+        font-size: 1.8rem;
+      }
+
+      h2 {
+        font-size: 0.95rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <!-- Page Title -->
+    <h1>Admin Login</h1>
+
+    <!-- College Info -->
+    <h2>
+      Jaywant College of Engineering &amp; Polytechnic
+      <span class="subtitle">Kille Machindragad, Tal. Walwa, Dist. Sangli</span>
+    </h2>
+
+    <!-- Login Form -->
+    <form id="loginForm">
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="username" placeholder="Enter username" required />
+
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" placeholder="Enter password" required />
+
+      <button type="submit">Login</button>
+    </form>
+
+    <!-- Links -->
+    <div class="links">
+      <p>Don’t have an account? <a href="admin_registration">Register College</a></p>
+      <a href="/index">← Back to Home</a>
+    </div>
+  </div>
+
+  <!-- === JS Logic === -->
+  <script>
+    // ✅ Handle login
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+
+      fetch("/admin_login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username_or_contact_number: username,
+          password: password
+        })
+      })
+      .then(res => {
+        if (!res.ok) {
+          return res.json().then(data => { throw new Error(data.error); });
+        }
+        return res.json();
+      })
+      .then(data => {
+        console.log("Login successful:", data);
+        window.location.href = 'analytics';
+      })
+      .catch(err => {
+        alert("Login failed: " + err.message);
+      });
+    });
+  </script>
+
+</body>
+</html>

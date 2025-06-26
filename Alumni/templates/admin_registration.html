@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>College Registration</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    body {
+      background: #f0f4f8;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      background: #ffffff;
+      padding: 40px 30px;
+      border-radius: 10px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+      max-width: 500px;
+      width: 100%;
+    }
+
+    h1 {
+      text-align: center;
+      color: #1e40af;
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px 14px;
+      margin-bottom: 20px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      box-sizing: border-box;
+      font-size: 1rem;
+      transition: border 0.3s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: #1e40af;
+      outline: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #1e40af, #1d4ed8);
+      border: none;
+      color: #ffffff;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    button:hover {
+      background: linear-gradient(135deg, #1d4ed8, #2563eb);
+      transform: translateY(-2px);
+    }
+
+    .links {
+      text-align: center;
+      margin-top: 25px;
+    }
+
+    .links a {
+      color: #1e40af;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s;
+      margin: 0 8px;
+    }
+
+    .links a:hover {
+      color: #2563eb;
+      text-decoration: underline;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 30px 20px;
+      }
+
+      h1 {
+        font-size: 1.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>College Registration</h1>
+
+    <!-- ✅ Back to Home Link -->
+    <div class="links">
+      <a href="/index">← Back to Home</a>
+    </div>
+
+    <form id="collegeForm">
+    <!-- ✅ College Name (auto init cap) -->
+      <label for="college_name">College Name:</label>
+      <input 
+        type="text" 
+        id="college_name" 
+        name="college_name" 
+        placeholder="Enter college name" 
+        required 
+        style="text-transform: capitalize;">
+
+      <!-- ✅ Username with suggestion and restriction -->
+      <label for="username">Username:</label>
+      <input 
+        type="text" 
+        id="username" 
+        name="username" 
+        pattern="[a-z0-9]+" 
+        title="Only lowercase letters and numbers allowed" 
+        placeholder="username" 
+        required 
+        autocomplete="off">
+      <small id="usernameSuggestion" style="color: #666; cursor: pointer;"></small>
+
+      <!-- ✅ Password and Show Password checkbox -->
+      <label for="password">Password:</label>
+      <input 
+        type="password" 
+        id="password" 
+        name="password" 
+        placeholder="Create a password" 
+        required>
+
+
+
+      <!-- ✅ College Email -->
+      <label for="email">College Email:</label>
+      <input 
+        type="email"
+        id="email"
+        name="email"
+        required
+        placeholder="example@college.edu"
+        pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+        title="Enter a valid college email">
+
+      <!-- ✅ College Contact Number -->
+      <label for="contact_number">College Contact Number:</label>
+      <input 
+        type="tel"
+        id="contact_number"
+        name="contact_number"
+        pattern="[0-9]{10}"
+        maxlength="10"
+        required
+        placeholder="Enter 10-digit contact number"
+        title="Please enter exactly 10 digits">
+
+      <!-- ✅ Address -->
+      <label for="address">Address:</label>
+      <textarea 
+        id="address"
+        name="address"
+        required
+        placeholder="Enter your address"></textarea>
+
+      <!-- ✅ City -->
+      <label for="city">City:</label>
+      <input 
+        type="text"
+        id="city"
+        name="city"
+        required
+        placeholder="Enter your city">
+
+      <!-- ✅ State -->
+      <label for="state">State:</label>
+      <input 
+        type="text"
+        id="state"
+        name="state"
+        required
+        placeholder="Enter your state">
+
+      <!-- ✅ Country -->
+      <label for="country">Country:</label>
+      <select id="country" name="country" required>
+        <option value="">-- Select Country --</option>
+      </select>
+
+      
+      <!-- ✅ Submit Button -->
+      <button type="submit">Register College</button>
+    </form>
+
+
+    <!-- ✅ Login Link -->
+    <div class="links">
+      <p>Already have an account?</p>
+      <a href="admin_login">Admin Login</a>
+    </div>
+  </div>
+
+<script>
+    // ✅ Auto capitalize College Name
+    document.getElementById('college_name').addEventListener('input', function () {
+      this.value = this.value.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+    });
+
+    // ✅ 2️⃣ Username: only lowercase letters & numbers
+    document.getElementById('username').addEventListener('input', function () {
+      // Remove all except lowercase letters & numbers
+      this.value = this.value.toLowerCase().replace(/[^a-z0-9]/g, '');
+    });
+
+    // ✅ Email input sanitization
+    document.getElementById('email').addEventListener('input', function () {
+      this.value = this.value.replace(/[^a-zA-Z0-9@._+-]/g, '');
+    });
+
+    // ✅ Contact number: digits only
+    document.getElementById('contact_number').addEventListener('input', function () {
+      this.value = this.value.replace(/\D/g, '').slice(0, 10);
+    });
+
+    // ✅ Address, City, State auto init cap
+    ['address', 'city', 'state'].forEach(id => {
+      const el = document.getElementById(id);
+      el.addEventListener('blur', () => {
+        el.value = el.value.trim().toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+      });
+    });
+    // ✅ Populate country dropdown
+    const countries = [
+      "Afghanistan","Albania","Algeria","Andorra","Angola","Argentina","Armenia",
+      "Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh",
+      "Barbados","Belarus","Belgium","Belize","Benin","Bhutan","Bolivia",
+      "Bosnia and Herzegovina","Botswana","Brazil","Brunei","Bulgaria","Burkina Faso",
+      "Burundi","Cambodia","Cameroon","Canada","Cape Verde","Central African Republic",
+      "Chad","Chile","China","Colombia","Comoros","Congo","Costa Rica","Croatia",
+      "Cuba","Cyprus","Czech Republic","Denmark","Djibouti","Dominica",
+      "Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea",
+      "Eritrea","Estonia","Eswatini","Ethiopia","Fiji","Finland","France","Gabon",
+      "Gambia","Georgia","Germany","Ghana","Greece","Grenada","Guatemala",
+      "Guinea","Guinea-Bissau","Guyana","Haiti","Honduras","Hungary","Iceland",
+      "India","Indonesia","Iran","Iraq","Ireland","Israel","Italy","Jamaica",
+      "Japan","Jordan","Kazakhstan","Kenya","Kiribati","Kuwait","Kyrgyzstan",
+      "Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein",
+      "Lithuania","Luxembourg","Madagascar","Malawi","Malaysia","Maldives",
+      "Mali","Malta","Marshall Islands","Mauritania","Mauritius","Mexico",
+      "Micronesia","Moldova","Monaco","Mongolia","Montenegro","Morocco",
+      "Mozambique","Myanmar","Namibia","Nauru","Nepal","Netherlands",
+      "New Zealand","Nicaragua","Niger","Nigeria","North Korea","North Macedonia",
+      "Norway","Oman","Pakistan","Palau","Palestine","Panama","Papua New Guinea",
+      "Paraguay","Peru","Philippines","Poland","Portugal","Qatar","Romania",
+      "Russia","Rwanda","Saint Kitts and Nevis","Saint Lucia",
+      "Saint Vincent and the Grenadines","Samoa","San Marino",
+      "Sao Tome and Principe","Saudi Arabia","Senegal","Serbia","Seychelles",
+      "Sierra Leone","Singapore","Slovakia","Slovenia","Solomon Islands",
+      "Somalia","South Africa","South Korea","South Sudan","Spain","Sri Lanka",
+      "Sudan","Suriname","Sweden","Switzerland","Syria","Tajikistan","Tanzania",
+      "Thailand","Timor-Leste","Togo","Tonga","Trinidad and Tobago","Tunisia",
+      "Turkey","Turkmenistan","Tuvalu","Uganda","Ukraine","United Arab Emirates",
+      "United Kingdom","United States","Uruguay","Uzbekistan","Vanuatu",
+      "Vatican City","Venezuela","Vietnam","Yemen","Zambia","Zimbabwe"
+    ];
+    const countrySelect = document.getElementById('country');
+    countries.forEach(country => {
+      const option = new Option(country, country);
+      if (country === 'India') option.selected = true;
+      countrySelect.add(option);
+    });
+
+    // ✅ Submit form as JSON
+    const collegeForm = document.getElementById('collegeForm');
+    collegeForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(collegeForm).entries());
+      try {
+        const response = await fetch('/register_college', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (response.ok) {
+          alert('College registered successfully!');
+          collegeForm.reset();
+          document.getElementById('country').value = 'India';
+        } else {
+          const err = await response.json();
+          alert('Error: ' + (err.error || err.message));
+        }
+      } catch (error) {
+        console.error('Network error:', error);
+        alert('Something went wrong. Please try again.');
+      }
+    });
+  </script>
+
+</body>
+</html>
