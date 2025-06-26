@@ -42,10 +42,7 @@ def apply_cors(response):
 app.secret_key = 'your-secret-key'  # Required for session management
 
 
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Sanjana@localhost:5432/alumni_db'
-# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mydatabase.db'  # Creates `mydatabase.db` file
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Shubham1592@database-1.cpw4qquwwo8l.eu-north-1.rds.amazonaws.com:5432/alumni_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -1088,34 +1085,6 @@ def admin_login():
         logger.error(traceback.format_exc())
         return jsonify({"error": "An unexpected error occurred during login"}), 500
 
-# # -------------------------------
-# # ✅ Session Timeout Check (15 min)
-# # -------------------------------
-# @app.before_request
-# def check_session_timeout():
-#     # ✅ Allow these routes without session:
-#     allowed_paths = [
-#         'admin_login', 'admin_login_page',
-#         'logout', 'static',
-#         'admin_registration_page'
-#     ]
-
-#     if request.endpoint in allowed_paths:
-#         return  # skip check
-
-#     last_activity = session.get('last_activity')
-#     if last_activity:
-#         last_activity_dt = datetime.strptime(last_activity, '%Y-%m-%d %H:%M:%S')
-#         now = datetime.utcnow()
-#         if now - last_activity_dt > timedelta(minutes=15):
-#             session.clear()
-#             # ✅ redirect instead of JSON
-#             return redirect(url_for('admin_login_page'))
-#         else:
-#             session['last_activity'] = now.strftime('%Y-%m-%d %H:%M:%S')
-#     else:
-#         # ✅ if no session at all, redirect to login
-#         return redirect(url_for('admin_login_page'))
 
 
 
